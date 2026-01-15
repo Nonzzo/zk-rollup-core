@@ -1,9 +1,12 @@
 const { Pool } = require('pg');
 const ZkState = require('./state');
 
+// Use the Environment Variable (injected by K8s), fallback to localhost only for local testing
+const connectionString = process.env.DATABASE_URL || "postgres://admin:password@localhost:5432/zkrollup";
+
 // Database Connection
 const pool = new Pool({
-    connectionString: "postgres://admin:password@localhost:5432/zkrollup"
+    connectionString: connectionString
 });
 
 class StateManager {
