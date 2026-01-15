@@ -76,8 +76,8 @@ jobs:
       # (This is a simple sed replacement to use the specific SHA tag we just built)
       - name: Deploy to K8s
         run: |
-          sed -i 's|image: .*/zk-rollup-backend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-backend:${{ github.sha }}|g' k8s/02-backend.yaml
-          sed -i 's|image: .*/zk-rollup-frontend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-frontend:${{ github.sha }}|g' k8s/03-frontend.yaml
+          sed -i 's|image: .*/zk-rollup-backend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-backend:${{ github.sha }}|g' k8s/backend.yaml
+          sed -i 's|image: .*/zk-rollup-frontend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-frontend:${{ github.sha }}|g' k8s/frontend.yaml
           
           kubectl apply -f k8s/postgres.yaml
           kubectl apply -f k8s/backend.yaml
