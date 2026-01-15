@@ -32,11 +32,14 @@ spec:
           value: "password"
         - name: POSTGRES_DB
           value: "zkrollup"
+         - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
         ports:
         - containerPort: 5432
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: postgres-storage
+          subPath: pgdata
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
