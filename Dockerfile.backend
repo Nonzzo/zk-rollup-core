@@ -1,32 +1,49 @@
+# --- Stage 1: Builder (Install dependencies & compile) ---
 FROM node:18-bullseye AS builder
 
 WORKDIR /app
 
-# Install build tools for crypto libraries (snarkjs/circom dependencies)
+# Install build tools
 RUN apt-get update && apt-get install -y python3 make g++
 
-# Copy package files first (better caching)
+# Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies like Hardhat)
+RUN npm install
+
+# Copy source code needed for compilation
+COPY hardhat.config.js ./
+COPY contracts ./contracts
+COPY src ./src
+COPY scripts ./scripts
+
+# ---  Compile Contracts inside Docker ---
+# This generates the 'artifacts/' folder inside the image
+RUN npx hardhat compile
 
 # --- Stage 2: Runner (Minimal runtime) ---
 FROM node:18-bullseye-slim
 
 WORKDIR /app
 
+# Install runtime libs
 RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy production node_modules from builder
-COPY --from=builder /app/node_modules ./node_modules
+# We re-run install for prod only to prune devDependencies (like Hardhat)
 COPY package*.json ./
+RUN npm install --only=production
 
 # Copy Application Code
 COPY src ./src
 COPY scripts ./scripts
-# Copy the ZK Artifacts (Generated in Phase 2)
+
+# Copy ZK Artifacts (Generated in Phase 2)
+
 COPY build ./build
-# Copy Hardhat Artifacts (ABI)
-COPY artifacts ./artifacts
+
+# Copy the Compiled Contract Artifacts from the Builder Stage
+COPY --from=builder /app/artifacts ./artifacts
 
 ENV NODE_ENV=production
 EXPOSE 3000
