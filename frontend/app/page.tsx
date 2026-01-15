@@ -3,6 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { ethers } from "ethers";
 
+declare global {
+    interface Window {
+        ethereum: any;
+    }
+}
+
 const API_URL =  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 const ROLLUP_ADDRESS = process.env.NEXT_PUBLIC_ROLLUP_ADDRESS || "";
 const ROLLUP_ABI = [
