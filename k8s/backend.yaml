@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zk-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zk-backend
+  template:
+    metadata:
+      labels:
+        app: zk-backend
+    spec:
+      containers:
+      - name: zk-backend
+        image: nonzzo/zk-rollup-backend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          value: "postgres://admin:password@postgres:5432/zkrollup" # Internal cluster DNS
+        - name: SEPOLIA_RPC_URL
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: SEPOLIA_RPC_URL
+        - name: PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: PRIVATE_KEY
+        - name: ROLLUP_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: ROLLUP_ADDRESS
+        
+        # Resource Limits (Important for Azure Free Tier)
+        resources:
+          requests: {}
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-backend-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: zk-backend

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zk-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zk-frontend
+  template:
+    metadata:
+      labels:
+        app: zk-frontend
+    spec:
+      containers:
+      - name: zk-frontend
+        image: nonzzo/zk-rollup-frontend:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-frontend-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: zk-frontend

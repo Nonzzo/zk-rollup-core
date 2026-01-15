@@ -1,0 +1,164 @@
+
+# Compilation output
+/dist
+
+# pnpm deploy output
+/bundle
+
+# Hardhat Build Artifacts
+/artifacts
+
+# Hardhat compilation (v2) support directory
+/cache
+
+# Typechain output
+/types
+
+# Hardhat coverage reports
+/coverage
+log.md
+test-result.md
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+/dist
+/build
+/bundle
+
+# Hardhat
+/artifacts
+/cache
+/typechain-types
+/coverage
+coverage.json
+
+# Compiled circuit outputs
+/circuits/*.r1cs
+/circuits/*.sym
+/circuits/*.wasm
+/circuits/build/
+
+# SnarkJS artifacts
+/input.json
+*.zkey
+*.ptau
+/powers/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+._.DS_Store
+
+# Testing
+test-result.md
+log.md
+
+# Frontend Next.js
+frontend/.next/
+frontend/out/
+frontend/.nuxt/
+frontend/dist/
+frontend/.turbo/
+frontend/.vercel/
+
+# PostgreSQL & Docker
+.dockerignore
+docker-compose.override.yml
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+*.pid
+
+# OS files
+Thumbs.db
+.AppleDouble
+.LSOverride
+*.pem
+*.key
+input.json
+
+flattened-selected.md
+flatten.sh
+
+node_modules/
+frontend/node_modules/
+
+# Environment Variables (CRITICAL SECURITY)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# Hardhat
+cache/
+coverage/
+coverage.json
+typechain-types/
+# NOTE: We keep 'artifacts/' tracked so Docker can copy the ABI without recompiling in CI.
+# If you prefer to compile in Docker, un-comment the next line:
+# artifacts/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+
+# ZK Proof Artifacts
+# We ignore the heavy intermediate files, but KEEP the final keys/wasm
+# so the Docker build can pick them up without re-running the trusted setup.
+build/*.ptau
+build/*.r1cs
+build/*.sym
+build/*.wtns
+# We DO want to commit these (so Docker has them):
+# !build/circuit_final.zkey
+# !build/verification_key.json
+# !build/rollup_js/rollup.wasm
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+
+# Logs & Diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
