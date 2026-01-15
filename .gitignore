@@ -70,6 +70,7 @@ coverage.json
 # Testing
 test-result.md
 log.md
+log1.md
 
 # Frontend Next.js
 frontend/.next/

@@ -78,6 +78,10 @@ jobs:
         run: |
           sed -i 's|image: .*/zk-rollup-backend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-backend:${{ github.sha }}|g' k8s/backend.yaml
           sed -i 's|image: .*/zk-rollup-frontend:latest|image: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-frontend:${{ github.sha }}|g' k8s/frontend.yaml
+
+          echo "--- Content of k8s/backend.yaml before apply ---"
+          cat k8s/backend.yaml 
+          echo "-------------------------------------------------" 
           
           kubectl apply -f k8s/postgres.yaml
           kubectl apply -f k8s/backend.yaml

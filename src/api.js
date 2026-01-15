@@ -1,5 +1,10 @@
 if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
+    try {
+        require('dotenv').config();
+    } catch (e) {
+        // Ignore if dotenv is missing in production
+        console.log("Not using dotenv");
+    }
 }
 const express = require('express');
 const cors = require('cors');

@@ -44,7 +44,6 @@ COPY build ./build
 
 # Copy the Compiled Contract Artifacts from the Builder Stage
 COPY --from=builder /app/artifacts ./artifacts
-
 ENV NODE_ENV=production
 EXPOSE 3000
 

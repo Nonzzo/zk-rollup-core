@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
       - name: zk-backend
-        image: nonzzo/zk-rollup-backend:latest
+        image: nonzzo/zk-rollup-backend:latest 
         ports:
         - containerPort: 3000
-        env:
+        env: 
         - name: DATABASE_URL
-          value: "postgres://admin:password@postgres:5432/zkrollup" # Internal cluster DNS
-        - name: SEPOLIA_RPC_URL
+          value: "postgres://admin:password@postgres:5432/zkrollup" 
+        - name: SEPOLIA_RPC_URL 
           valueFrom:
             secretKeyRef:
               name: backend-secrets
@@ -36,9 +36,7 @@ spec:
               name: backend-secrets
               key: ROLLUP_ADDRESS
         
-        # Resource Limits (Important for Azure Free Tier)
-        resources:
-          requests: {}
+        resources: {}
             
 ---
 apiVersion: v1
