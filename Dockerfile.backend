@@ -21,6 +21,8 @@ COPY circuits ./circuits
 COPY src ./src
 COPY scripts ./scripts
 
+ARG CACHE_BUSTER_ZK=$(date +%s)
+
 # 5. Build ZK Artifacts (Generates build/ and contracts/Verifier.sol)
 # We need to make the script executable
 RUN chmod +x scripts/compile-local.sh
@@ -43,6 +45,8 @@ RUN npm install --only=production
 # Copy App Code
 COPY src ./src
 COPY scripts ./scripts
+
+
 
 # Copy Artifacts from Builder
 # A. ZK Keys & Wasm
