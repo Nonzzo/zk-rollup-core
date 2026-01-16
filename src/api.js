@@ -42,11 +42,37 @@ app.use(bodyParser.json());
 
 const pool = new Pool({ connectionString: DATABASE_URL });
 
+async function migrate() {
+    try {
+        console.log("🛠️ Checking DB Schema...");
+        const client = await pool.connect();
+        try {
+            // 1. Add 'proof' column if missing
+            await client.query(`ALTER TABLE transactions ADD COLUMN IF NOT EXISTS proof TEXT;`);
+            
+            // 2. Add 'type' column (For Deposits/Withdrawals)
+            await client.query(`ALTER TABLE transactions ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'TRANSFER';`);
+            
+            // 3. Add 'to_address' column (For Withdrawals)
+            await client.query(`ALTER TABLE transactions ADD COLUMN IF NOT EXISTS to_address TEXT;`);
+            
+            console.log("✅ DB Schema verified/updated.");
+        } finally {
+            client.release();
+        }
+    } catch (e) {
+        console.error("❌ Migration failed:", e.message);
+        // Don't exit, let the app try to run anyway
+    }
+}
+
 async function start() {
     // 1. Database & State Init
     const sql = fs.readFileSync(path.join(__dirname, 'db/init.sql')).toString();
     await pool.query(sql);
     await stateManager.initialize();
+
+    await migrate(); // This fixes columns if tables DO exist but are old
 
     // 2. Setup Blockchain Connection (The Sequencer Wallet)
     const provider = new ethers.JsonRpcProvider(RPC_URL);
