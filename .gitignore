@@ -113,6 +113,9 @@ frontend/node_modules/
 .env.production
 
 # Hardhat
+build/
+artifacts/
+contracts/Verifier.sol
 cache/
 coverage/
 coverage.json

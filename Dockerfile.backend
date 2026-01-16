@@ -1,48 +1,53 @@
-# --- Stage 1: Builder (Install dependencies & compile) ---
+# --- Stage 1: Builder ---
 FROM node:22-bullseye AS builder
 
 WORKDIR /app
 
-# Install build tools
-RUN apt-get update && apt-get install -y python3 make g++
+# 1. Install system tools + wget (to download circom)
+RUN apt-get update && apt-get install -y python3 make g++ wget
 
-# Copy package files
+# 2. Install Circom (The ZK Compiler)
+RUN wget -qO /usr/local/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64 && \
+    chmod +x /usr/local/bin/circom
+
+# 3. Install Dependencies
 COPY package*.json ./
-# Install ALL dependencies (including devDependencies like Hardhat)
 RUN npm install
 
-# Copy source code needed for compilation
+# 4. Copy Source Code
 COPY hardhat.config.js ./
 COPY contracts ./contracts
+COPY circuits ./circuits
 COPY src ./src
 COPY scripts ./scripts
 
-# ---  Compile Contracts inside Docker ---
-# This generates the 'artifacts/' folder inside the image
+# 5. Build ZK Artifacts (Generates build/ and contracts/Verifier.sol)
+# We need to make the script executable
+RUN chmod +x scripts/compile-local.sh
+RUN ./scripts/compile-local.sh
+
+# 6. Build Solidity Contracts (Now that Verifier.sol exists)
 RUN npx hardhat compile
 
-# --- Stage 2: Runner (Minimal runtime) ---
+# --- Stage 2: Runner ---
 FROM node:22-bullseye-slim
 
 WORKDIR /app
 
-# Install runtime libs
+# Runtime libs
 RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Copy production node_modules from builder
-# We re-run install for prod only to prune devDependencies (like Hardhat)
 COPY package*.json ./
 RUN npm install --only=production
 
-# Copy Application Code
+# Copy App Code
 COPY src ./src
 COPY scripts ./scripts
 
-# Copy ZK Artifacts (Generated in Phase 2)
-
-COPY build ./build
-
-# Copy the Compiled Contract Artifacts from the Builder Stage
+# Copy Artifacts from Builder
+# A. ZK Keys & Wasm
+COPY --from=builder /app/build ./build
+# B. Solidity ABI
 COPY --from=builder /app/artifacts ./artifacts
 
 ENV NODE_ENV=production
