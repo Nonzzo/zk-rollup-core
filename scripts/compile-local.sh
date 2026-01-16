@@ -9,16 +9,16 @@ echo "Compiling circuit..."
 circom circuits/rollup.circom --r1cs --wasm --sym --output build
 
 # 2. Trusted Setup (Plonk)
-if [ ! -f "build/pot12_final.ptau" ]; then
+if [ ! -f "build/pot14_final.ptau" ]; then
     echo "Generating dummy Powers of Tau..."
-    npx snarkjs powersoftau new bn128 12 build/pot12_0000.ptau -v
-    npx snarkjs powersoftau contribute build/pot12_0000.ptau build/pot12_contribution.ptau --name="First Contribution" -v -e="random text"
-    npx snarkjs powersoftau prepare phase2 build/pot12_contribution.ptau build/pot12_final.ptau -v
+    npx snarkjs powersoftau new bn128 14 build/pot14_0000.ptau -v
+    npx snarkjs powersoftau contribute build/pot14_0000.ptau build/pot14_contribution.ptau --name="First Contribution" -v -e="random text"
+    npx snarkjs powersoftau prepare phase2 build/pot14_contribution.ptau build/pot14_final.ptau -v
 fi
 
 # 3. Key Generation
 echo "Generating Plonk keys..."
-npx snarkjs plonk setup build/rollup.r1cs build/pot12_final.ptau build/circuit_final.zkey
+npx snarkjs plonk setup build/rollup.r1cs build/pot14_final.ptau build/circuit_final.zkey
 
 # 4. Export Verifier for Solidity
 # We export to contracts/ folder so Hardhat can find it later
