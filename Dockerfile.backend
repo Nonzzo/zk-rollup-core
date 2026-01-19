@@ -46,6 +46,9 @@ RUN npm install --only=production
 COPY src ./src
 COPY scripts ./scripts
 
+COPY hardhat.config.js ./
+COPY contracts ./contracts
+
 
 
 # Copy Artifacts from Builder
@@ -53,6 +56,8 @@ COPY scripts ./scripts
 COPY --from=builder /app/build ./build
 # B. Solidity ABI
 COPY --from=builder /app/artifacts ./artifacts
+
+
 
 ENV NODE_ENV=production
 EXPOSE 3000
