@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zk-deployer
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      containers:
+      - name: deployer
+        image: nonzzo/zk-rollup-backend:latest
+        command: ["npx", "hardhat", "run", "scripts/deploy.js", "--network", "sepolia"]
+        env:
+        - name: SEPOLIA_RPC_URL
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: SEPOLIA_RPC_URL
+        - name: PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: PRIVATE_KEY
+        - name: DATABASE_URL 
+          value: "postgres://admin:password@postgres:5432/zkrollup"
+      restartPolicy: Never

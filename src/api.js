@@ -210,6 +210,16 @@ async function start() {
         }
     });
 
+    //  Serve the configuration to the frontend
+    app.get('/config', (req, res) => {
+        res.json({
+            rollupAddress: ROLLUP_ADDRESS,
+            // You can add other public config here if needed
+        });
+    });
+
+    
+
     app.listen(3000, () => {
         console.log('🚀 L2 Node API running on port 3000');
     });
