@@ -42,7 +42,7 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_HUB_REPO }}/zk-rollup-frontend:latest,${{ env.DOCKER_HUB_REPO }}/zk-rollup-frontend:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_API_URL=http://${{ secrets.BACKEND_LB_IP }}
+            NEXT_PUBLIC_API_URL=${{ secrets.BACKEND_LB_IP }}
             NEXT_PUBLIC_ROLLUP_ADDRESS=${{ secrets.ROLLUP_ADDRESS }}
 
   deploy-to-aks:
