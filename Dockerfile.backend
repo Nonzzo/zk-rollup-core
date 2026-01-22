@@ -57,7 +57,8 @@ COPY --from=builder /app/build ./build
 # B. Solidity ABI
 COPY --from=builder /app/artifacts ./artifacts
 
-
+# --- DEBUGGING STEP ---
+RUN ls -l /app/src
 
 ENV NODE_ENV=production
 EXPOSE 3000
