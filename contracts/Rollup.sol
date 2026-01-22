@@ -43,6 +43,7 @@ contract ZkRollup {
         uint256[24] calldata _proof,
         address[] calldata withdrawalReceivers,
         uint256[] calldata withdrawalAmounts
+        
     ) external {
         require(withdrawalReceivers.length == withdrawalAmounts.length, "Length mismatch");
 

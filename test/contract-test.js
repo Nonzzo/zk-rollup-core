@@ -71,7 +71,7 @@ describe("ZkRollup On-Chain Integration", function () {
     console.log("Parsed Root:", pubSignalsArray[0]);
 
     // 3. Submit to Smart Contract
-    const tx = await rollup.submitBatch(pubSignalsArray[0], proofArray);
+    const tx = await rollup.submitBatch(pubSignalsArray[0], proofArray, [], []);
     await tx.wait();
 
     // 4. Verify On-Chain State Updated

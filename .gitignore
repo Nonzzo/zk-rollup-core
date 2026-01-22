@@ -45,6 +45,7 @@ pnpm-lock.yaml
 /typechain-types
 /coverage
 coverage.json
+updatesecret.sh
 
 # Compiled circuit outputs
 /circuits/*.r1cs
