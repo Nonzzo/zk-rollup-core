@@ -38,6 +38,7 @@ pnpm-lock.yaml
 /dist
 
 /bundle
+flattened-selected.txt
 
 # Hardhat
 /artifacts
