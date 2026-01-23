@@ -13,7 +13,7 @@ circom circuits/rollup.circom --r1cs --wasm --sym --output build
 # We use the official Hermez Powers of Tau (Size 14)
 # This file is constant, so our ZKey generation will be consistent.
 PTAU_FILE="build/powersOfTau28_hez_final_14.ptau"
-PTAU_URL="https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_14.ptau"
+PTAU_URL="https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_14.ptau
 
 if [ ! -f "$PTAU_FILE" ]; then
     echo "Downloading Official Powers of Tau (Size 14)..."
