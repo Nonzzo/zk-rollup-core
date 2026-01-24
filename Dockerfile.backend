@@ -1,54 +1,86 @@
-# --- Stage 1: Builder ---
-FROM node:22-bookworm  AS builder
+# --- Stage 1: ZK Builder (Deterministic) ---
+FROM node:22-bookworm AS zk-builder
 
 WORKDIR /app
 
-# 1. Install system tools
-RUN apt-get update && apt-get install -y python3 make g++ wget
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Install Circom
-RUN wget -qO /usr/local/bin/circom https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64 && \
-    chmod +x /usr/local/bin/circom
+# Install Circom (specific version for reproducibility)
+RUN wget -qO /usr/local/bin/circom \
+    https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64 && \
+    chmod +x /usr/local/bin/circom && \
+    circom --version
 
-# 3. Install Dependencies
+# Copy only what's needed for ZK build
 COPY package*.json ./
 RUN npm install
 
-# 4. Copy Code
+COPY circuits ./circuits
+COPY scripts/compile-local.sh ./scripts/
+
+# Build ZK artifacts using OFFICIAL ceremony (100% reproducible)
+RUN chmod +x scripts/compile-local.sh && \
+    ./scripts/compile-local.sh
+
+# Verify critical files exist
+RUN test -f build/circuit_final.zkey && \
+    test -f build/rollup_js/rollup.wasm && \
+    test -f contracts/Verifier.sol && \
+    echo "✅ All ZK artifacts generated successfully"
+
+# --- Stage 2: Solidity Compiler ---
+FROM node:22-bookworm AS sol-builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
 COPY hardhat.config.js ./
 COPY contracts ./contracts
-COPY circuits ./circuits
-COPY src ./src
-COPY scripts ./scripts
 
-# 5. Build ZK Artifacts (This generates build/ and contracts/Verifier.sol)
+# Copy the deterministically-built Verifier.sol from Stage 1
+COPY --from=zk-builder /app/contracts/Verifier.sol ./contracts/
 
-ARG CACHE_BUSTER_ZK=$(date +%s)
-RUN chmod +x scripts/compile-local.sh
-RUN ./scripts/compile-local.sh
-
-# 6. Build Solidity (This generates artifacts/ based on the NEW Verifier.sol)
+# Compile Solidity contracts
 RUN npx hardhat compile
 
-# --- Stage 2: Runner ---
+# --- Stage 3: Runtime (Minimal) ---
 FROM node:22-bookworm-slim
 
 WORKDIR /app
-RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# Install minimal runtime dependencies
+RUN apt-get update && \
+    apt-get install -y openssl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install production Node dependencies only
 COPY package*.json ./
 RUN npm install --only=production
 
-
+# Copy application code
 COPY src ./src
 COPY scripts ./scripts
-# Copy configs needed for deployment
 COPY hardhat.config.js ./
-COPY contracts ./contracts
 
-# Copy the artifacts GENERATED in Stage 1
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/artifacts ./artifacts
+# Copy compiled artifacts from previous stages
+COPY --from=zk-builder /app/build ./build
+COPY --from=sol-builder /app/artifacts ./artifacts
+COPY --from=sol-builder /app/contracts ./contracts
+
+# Verify everything is in place
+RUN test -f build/circuit_final.zkey && \
+    test -f build/rollup_js/rollup.wasm && \
+    test -f artifacts/contracts/Rollup.sol/ZkRollup.json && \
+    echo "✅ Runtime image ready"
 
 ENV NODE_ENV=production
 EXPOSE 3000
